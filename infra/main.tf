@@ -107,3 +107,11 @@ resource "aws_lambda_function" "app" {
 
   tags = local.etiquetas
 }
+
+
+resource "aws_cloudwatch_log_group" "basura_inyeccion2" {
+  name              = "/aws/lab3/basura-inyeccion2"
+  retention_in_days = 1
+
+  tags = local.etiquetas
+}
