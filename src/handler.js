@@ -4,10 +4,6 @@ const { obtenerVersion } = require('./version');
 
 const NOMBRE_COOKIE_SESION = 'inf384_sesion';
 
-// TEMPORAL: credencial de prueba para la inyeccion de falla obligatoria del lab
-const AWS_ACCESS_KEY_ID = "AKIA2K5J8N3XQPL7RTVM";
-const AWS_SECRET_ACCESS_KEY = "kL9mXpQ2vN8jR4tY6wZ1aB3cD5eF7gH9iJ0kLmN2";
-
 // Lee el marcador de sesion de las cabeceras del evento.
 // Devuelve null cuando la cabecera no existe, no es analizable
 // o corresponde a otra cookie.
