@@ -40,6 +40,14 @@ locals {
 
 # Sin esta politica la funcion no puede descargar la imagen.
 # El repositorio ya existe: aca solo se le cuelga la politica.
+#
+# Excepcion: AVD-AWS-XXXX, permite a Lambda descargar sin condicion
+# aws:SourceArn. Agregarla crea una dependencia circular con la funcion
+# Lambda, que depende de esta politica para poder crearse.
+# Responsable: <tu nombre>. Vence: 2026-10-15.
+# NOTA: confirma el ID real (AVD-AWS-XXXX) corriendo el job "politicas"
+# antes de dejar este comentario asi, y activa la linea de abajo.
+#trivy:ignore:AVD-AWS-XXXX
 resource "aws_ecr_repository_policy" "descarga_lambda" {
   repository = var.nombre_aplicacion
 
@@ -65,7 +73,7 @@ resource "aws_ecr_repository_policy" "descarga_lambda" {
 # o la funcion crea el suyo y esta retencion no aplica.
 resource "aws_cloudwatch_log_group" "funcion" {
   name              = "/aws/lambda/${var.nombre_aplicacion}"
-  retention_in_days = 1
+  retention_in_days = 7
 
   tags = local.etiquetas
 }
@@ -76,7 +84,7 @@ resource "aws_lambda_function" "app" {
   package_type  = "Image"
   image_uri     = local.imagen_inicial
   architectures = ["x86_64"]
-  memory_size   = 512
+  memory_size   = 1024
   timeout       = 30
 
   environment {
