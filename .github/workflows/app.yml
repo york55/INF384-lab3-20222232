@@ -271,6 +271,8 @@ jobs:
         context: .
         platforms: linux/amd64
         push: true
+        provenance: false
+        sbom: false
         tags: |
           ${{ steps.refs.outputs.registro }}:${{ steps.refs.outputs.sha_corto }}
           ${{ steps.refs.outputs.registro }}:prd
