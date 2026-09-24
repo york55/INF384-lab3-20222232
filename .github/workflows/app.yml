@@ -157,7 +157,17 @@ jobs:
           cat trivy-dependencias.txt
           echo '```'
         } >> "$GITHUB_STEP_SUMMARY"
-
+        
+    - name: Analisis de dependencias, arbol completo
+      uses: aquasecurity/trivy-action@v0.36.0
+      env:
+        TRIVY_INCLUDE_DEV_DEPS: "true"
+      with:
+        scan-type: fs
+        scanners: vuln
+        format: table
+        output: trivy-dependencias.txt
+        exit-code: '0'
   # TODO
   # Buscar patrones explotables en el codigo fuente.
   #
