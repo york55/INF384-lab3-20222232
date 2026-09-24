@@ -236,12 +236,49 @@ jobs:
   #
   # Sustituir el paso centinela por la implementacion.
   publicar:
+    needs: [calidad, secretos, dependencias, estatico]
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.componer.outputs.digest }}
     steps:
-      - name: Sin implementar
-        run: |
-          echo "::error::El job 'publicar' no esta implementado."
-          exit 1
+    - uses: actions/checkout@v4
+
+    - uses: docker/setup-buildx-action@v3
+
+    - name: Credenciales temporales de AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+
+    - name: Login en ECR
+      id: ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Referencias de la imagen
+      id: refs
+      run: |
+        echo "registro=${{ steps.ecr.outputs.registry }}/inf384-lab3" >> "$GITHUB_OUTPUT"
+        echo "sha_corto=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+    - name: Build y push
+      id: build
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        platforms: linux/amd64
+        push: true
+        tags: |
+          ${{ steps.refs.outputs.registro }}:${{ steps.refs.outputs.sha_corto }}
+          ${{ steps.refs.outputs.registro }}:prd
+        labels: org.opencontainers.image.title=inf384-lab3
+
+    - name: Componer el digest completo
+      id: componer
+      run: echo "digest=${{ steps.refs.outputs.registro }}@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
 
   # Este job viene completo y no se modifica.
   # Las estrategias de despliegue y la verificacion posterior son contenido
