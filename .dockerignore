@@ -1,0 +1,9 @@
+.git
+.github
+infra
+test
+node_modules
+dist
+coverage
+*.md
+.dockerignore
